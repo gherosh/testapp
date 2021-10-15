@@ -11,6 +11,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Categories from "./components/Categories";
 import Articles from "./components/Articles";
+import ArticleShow from "./components/ArticleShow";
+import AddUser from "./components/AddUser";
 
 export default function App() {
     return (
@@ -23,6 +25,13 @@ export default function App() {
                     </Route>
                     <Route path="/categories">
                         <Categories />
+                    </Route>
+
+                    <Route path="/add/user">
+                        <AddUser />
+                    </Route>
+                    <Route path="/article/:slug">
+                        <ArticleShow />
                     </Route>
                     <Route path="/">
                         <Articles />

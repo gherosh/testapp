@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ArticleResource;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\Article;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
-class ArticleController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +19,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return ArticleResource::collection(Article::orderBy('id', 'desc')->paginate(10));
+        return UserResource::collection(User::orderBy('id', 'desc')->paginate(10));
     }
 
     /**
@@ -31,23 +35,34 @@ class ArticleController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param StoreUserRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        $user = User::firstOrCreate([
+            'name' => $validated['name'],
+            'surname' => $validated['surname'],
+            'email' => $validated['email'],
+            'email_verified_at' => now(),
+            'password' => Hash::make($validated['password']),
+            'image' => 'https://via.placeholder.com/100x100.png/006600?text=QZ',
+            'remember_token' => Str::random(10),
+        ]);
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  string $slug
-     * @return ArticleResource
+     * @param  int $id
+     * @return UserResource
      */
-    public function show($slug)
+    public function show($id)
     {
-        return new ArticleResource(Article::whereSlug($slug)->firstOrFail());
+        return new UserResource(User::whereId($id)->firstOrFail());
     }
 
     /**
