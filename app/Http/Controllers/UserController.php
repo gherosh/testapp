@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
@@ -19,7 +20,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::orderBy('id', 'desc')->paginate(10));
+        return UserResource::collection(User::orderBy('id', 'desc')->get());
     }
 
     /**
@@ -36,20 +37,47 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreUserRequest $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreUserRequest $request)
     {
         $validated = $request->validated();
 
-        $user = User::firstOrCreate([
-            'name' => $validated['name'],
-            'surname' => $validated['surname'],
-            'email' => $validated['email'],
-            'email_verified_at' => now(),
-            'password' => Hash::make($validated['password']),
-            'image' => 'https://via.placeholder.com/100x100.png/006600?text=QZ',
-            'remember_token' => Str::random(10),
+        try {
+            $user = User::firstOrCreate([
+                'name' => $validated['name'],
+                'surname' => $validated['surname'],
+                'email' => $validated['email'],
+                'email_verified_at' => now(),
+                'password' => Hash::make($validated['password']),
+                'image' => 'https://via.placeholder.com/100x100.png/006600?text=QZ',
+                'remember_token' => Str::random(10),
+            ]);
+
+            if ($request->hasFile('file')) {
+                $image = $request->file('file');
+                $filename = 'avatar' . $user->id . time() . '480.jpg';
+                $relative_dir = 'uploads/' . date('Y_m');
+
+                $dir = public_path($relative_dir);
+
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+                $path = $dir . '/' . $filename;
+                Image::make($image->getRealPath())->widen(480)->save($path, 90, 'jpg');
+                $user->image = $relative_dir . '/' . $filename;
+                $user->save();
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage()
+            ]);
+        }
+        return response()->json([
+            'error' => false,
+            'message' => 'User added'
         ]);
 
     }

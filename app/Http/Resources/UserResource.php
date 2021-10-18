@@ -18,7 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'surname' => $this->surname,
-            'image' => $this->image,
+            'image' => strpos($this->image,'://') !== false ? $this->image : url($this->image),
         ];
     }
 }

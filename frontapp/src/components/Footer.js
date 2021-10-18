@@ -22,15 +22,15 @@ const Footer = () => {
                             <ul className="list-reset items-center text-sm pt-3">
                                 <li>
                                     <Link className="inline-block text-gray-600 no-underline hover:text-gray-900 hover:text-underline py-1"
-                                          to="add/user">Add user</Link>
+                                          to="add-user">Add user</Link>
                                 </li>
                                 <li>
                                     <Link className="inline-block text-gray-600 no-underline hover:text-gray-900 hover:text-underline py-1"
-                                          to="add/category">Add category</Link>
+                                          to="add-category">Add category</Link>
                                 </li>
                                 <li>
                                     <Link className="inline-block text-gray-600 no-underline hover:text-gray-900 hover:text-underline py-1"
-                                          to="add/article">Add article</Link>
+                                          to="add-article">Add article</Link>
                                 </li>
                             </ul>
                         </div>

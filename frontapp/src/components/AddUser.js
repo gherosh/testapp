@@ -6,8 +6,12 @@ const AddUser = () => {
     const [surname, setSurname] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [file, setFile] = useState('');
+    const [file, setSelectedFile] = useState(null);
     const [errors, setErrors] = useState({name:'', surname:'', email:'', password:''});
+
+    const onFileChange = (e) => {
+        setSelectedFile(e.target.files[0]);
+    };
 
     const validEmailRegex = RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);
 
@@ -39,15 +43,39 @@ const AddUser = () => {
             formData.append("surname", surname);
             formData.append("email", email);
             formData.append("password", password);
+            formData.append("file", file);
 
             axios.post('http://127.0.0.1:8000/api/users', formData)
                 .then((res) => {
-                    setName('')
-                    setSurname('')
-                    setEmail('')
-                    setPassword('')
+                    if (res.data.error) {
+                        alert(res.data.message)
+                    } else {
+                        alert(res.data.message)
+                        setName('')
+                        setSurname('')
+                        setEmail('')
+                        setPassword('')
+                        setSelectedFile(null)
+                    }
                 })
-                .catch((err) => alert("File Upload Error"));
+                .catch((error) => {
+                    if (error.response) {
+                        if (error.response.data.errors) {
+                            let errorMsg = ''
+                            for (const [key, value] of Object.entries(error.response.data.errors)) {
+                                errorMsg = errorMsg + value + "\n"
+                            }
+                            alert(errorMsg)
+                        } else {
+                            alert('Unknown error!')
+                        }
+                    } else if (error.request) {
+                        console.log(error.request)
+                        alert('Request error!')
+                    } else {
+                        console.log('Other error!')
+                    }
+                });
 
         } else {
             console.error('Invalid Form')
@@ -179,7 +207,7 @@ const AddUser = () => {
                     <input
                         className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         id="grid-image" name="file" type="file"
-                        onChange={(e) => setFile(e.target.files[0])} />
+                        onChange={onFileChange} />
                     <p className="text-gray-600 text-xs italic">Select file for upload</p>
                 </div>
             </div>

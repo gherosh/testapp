@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreArticleRequest;
-use App\Http\Resources\ArticleResource;
-use App\Models\Article;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Resources\CategoryResource;
+use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class ArticleController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,7 +18,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return ArticleResource::collection(Article::orderBy('id', 'desc')->paginate(10));
+        return CategoryResource::collection(Category::orderBy('title')->get());
     }
 
     /**
@@ -34,20 +34,19 @@ class ArticleController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreArticleRequest $request
+     * @param StoreCategoryRequest $request
      * @return JsonResponse
      */
-    public function store(StoreArticleRequest $request)
+    public function store(StoreCategoryRequest $request)
     {
         $validated = $request->validated();
+
         try {
-            $article = Article::firstOrCreate([
+            $category = Category::firstOrCreate([
                 'title' => $validated['title'],
                 'slug' => Str::slug($validated['title']),
-                'content' => $validated['content'],
-                'user_id' => $validated['userId'],
+                'description' => $validated['description'],
             ]);
-            $article->categories()->sync(json_decode($validated['categoryId']));
         } catch (\Exception $e) {
             return response()->json([
                 'error' => true,
@@ -64,11 +63,11 @@ class ArticleController extends Controller
      * Display the specified resource.
      *
      * @param  string $slug
-     * @return ArticleResource
+     * @return CategoryResource
      */
     public function show($slug)
     {
-        return new ArticleResource(Article::whereSlug($slug)->firstOrFail());
+        return new CategoryResource(Category::whereSlug($slug)->firstOrFail());
     }
 
     /**
@@ -85,7 +84,7 @@ class ArticleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
