@@ -20,7 +20,7 @@ class ArticleResource extends JsonResource
             'slug' => $this->slug,
             'content' => $this->content,
             'user' => new UserResource($this->user),
-            'categories' => CategoryResource::collection($this->categories),
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

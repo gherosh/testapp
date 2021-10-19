@@ -18,6 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'surname' => $this->surname,
+            'articles' => ArticleResource::collection($this->whenLoaded('articles')),
             'image' => strpos($this->image,'://') !== false ? $this->image : url($this->image),
         ];
     }

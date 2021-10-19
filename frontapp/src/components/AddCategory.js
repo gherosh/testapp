@@ -1,5 +1,6 @@
 import {useState} from 'react'
 import axios from "axios";
+import {API_HOST} from "../config";
 
 const AddCategory = () => {
     const [title, setTitle] = useState('')
@@ -33,7 +34,7 @@ const AddCategory = () => {
             formData.append("title", title);
             formData.append("description", description);
 
-            axios.post('http://127.0.0.1:8000/api/categories', formData)
+            axios.post(API_HOST + 'categories', formData)
                 .then((res) => {
                     if (res.data.error) {
                         alert(res.data.message)

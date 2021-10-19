@@ -7,6 +7,7 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
@@ -18,7 +19,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return CategoryResource::collection(Category::orderBy('title')->get());
+        $items = Cache::remember('categories', 86400, function() {
+            return Category::orderBy('title')->get();
+        });
+        return CategoryResource::collection($items);
     }
 
     /**
@@ -47,6 +51,7 @@ class CategoryController extends Controller
                 'slug' => Str::slug($validated['title']),
                 'description' => $validated['description'],
             ]);
+            Cache::forget('categories');
         } catch (\Exception $e) {
             return response()->json([
                 'error' => true,
@@ -67,7 +72,10 @@ class CategoryController extends Controller
      */
     public function show($slug)
     {
-        return new CategoryResource(Category::whereSlug($slug)->firstOrFail());
+        $item = Cache::remember('category'.$slug, 86400, function() use ($slug) {
+            return Category::with('articles')->whereSlug($slug)->firstOrFail();
+        });
+        return new CategoryResource($item);
     }
 
     /**

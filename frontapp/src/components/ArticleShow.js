@@ -1,7 +1,9 @@
 import ArticleCategories from "./ArticleCategories";
 import {useEffect, useState} from "react";
-import { useHistory, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import axios from "axios";
+import {Link} from "react-router-dom";
+import {API_HOST} from "../config";
 
 const ArticleShow = () => {
     const { slug } = useParams()
@@ -9,7 +11,7 @@ const ArticleShow = () => {
     const [loading, setLoading] = useState(true);
     const fetchData = async () => {
         setLoading(true);
-        const res = await axios.get("http://127.0.0.1:8000/api/articles/" + slug);
+        const res = await axios.get(API_HOST + "articles/" + slug);
         setArticle(res.data.data);
         setLoading(false);
     };
@@ -32,7 +34,7 @@ const ArticleShow = () => {
                 <div className="flex w-full items-center font-sans px-1 py-2">
                     <img className="w-10 h-10 rounded-full mr-4" src={article.user.image} alt="Avatar of Author" />
                     <div className="flex-1 px-2">
-                        <p className="text-base md:text-md leading-none">{article.user.name} {article.user.surname}</p>
+                        <Link to={'/users/'+article.user.id} className="text-base md:text-md leading-none">{article.user.name} {article.user.surname}</Link>
                     </div>
                 </div>
             </div>

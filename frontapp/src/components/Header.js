@@ -29,6 +29,9 @@ const Header = () => {
                             <NavLink activeClassName="text-gray-900 font-bold" className="inline-block text-gray-600 no-underline hover:text-gray-900 py-2 px-4" to="/categories">Categories</NavLink>
                         </li>
                         <li className="mr-3">
+                            <NavLink activeClassName="text-gray-900 font-bold" className="inline-block text-gray-600 no-underline hover:text-gray-900 py-2 px-4" to="/users">Users</NavLink>
+                        </li>
+                        <li className="mr-3">
                             <NavLink activeClassName="text-gray-900 font-bold" className="inline-block text-gray-600 no-underline hover:text-gray-900 py-2 px-4" to="/about">About</NavLink>
                         </li>
                     </ul>

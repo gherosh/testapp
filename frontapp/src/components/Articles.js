@@ -2,6 +2,7 @@ import Article from './Article'
 import Pagination from "./Pagination";
 import {useEffect, useState} from 'react'
 import axios from "axios";
+import {API_HOST} from "../config";
 
 const Articles = () => {
     const [data, setData] = useState({data:[], links:{}, meta:{}})
@@ -10,7 +11,7 @@ const Articles = () => {
 
     const fetchData = async (page) => {
         setLoading(true);
-        const res = await axios.get("http://127.0.0.1:8000/api/articles?page=" + page);
+        const res = await axios.get(API_HOST + "articles?page=" + page);
         setData(res.data);
         setLoading(false);
     };

@@ -1,5 +1,6 @@
 import {useState} from 'react'
 import axios from "axios";
+import {API_HOST} from "../config";
 
 const AddUser = () => {
     const [name, setName] = useState('')
@@ -45,7 +46,7 @@ const AddUser = () => {
             formData.append("password", password);
             formData.append("file", file);
 
-            axios.post('http://127.0.0.1:8000/api/users', formData)
+            axios.post(API_HOST + 'users', formData)
                 .then((res) => {
                     if (res.data.error) {
                         alert(res.data.message)

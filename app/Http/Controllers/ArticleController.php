@@ -7,6 +7,7 @@ use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class ArticleController extends Controller
@@ -18,7 +19,13 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return ArticleResource::collection(Article::orderBy('id', 'desc')->paginate(10));
+        $page = request()->get('page', 1);
+
+        $items = Cache::remember('articles'.$page, 86400, function() {
+            return Article::with('categories')->orderBy('id', 'desc')->paginate(10);
+        });
+
+        return ArticleResource::collection($items);
     }
 
     /**
@@ -48,6 +55,13 @@ class ArticleController extends Controller
                 'user_id' => $validated['userId'],
             ]);
             $article->categories()->sync(json_decode($validated['categoryId']));
+
+            //forget cache
+            $count = Article::count();
+            $pages = ceil($count/10);
+            for ($i = 1; $i <= $pages; $i++) {
+                Cache::forget('articles'.$i);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'error' => true,
@@ -56,7 +70,7 @@ class ArticleController extends Controller
         }
         return response()->json([
             'error' => false,
-            'message' => 'Category added'
+            'message' => 'Article added'
         ]);
     }
 
@@ -68,7 +82,10 @@ class ArticleController extends Controller
      */
     public function show($slug)
     {
-        return new ArticleResource(Article::whereSlug($slug)->firstOrFail());
+        $item = Cache::remember('article'.$slug, 86400, function() use ($slug) {
+            return Article::with('categories')->whereSlug($slug)->firstOrFail();
+        });
+        return new ArticleResource($item);
     }
 
     /**

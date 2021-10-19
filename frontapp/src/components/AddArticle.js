@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import axios from "axios";
-import * as util from "util";
+import {API_HOST} from "../config";
 
 const AddArticle = () => {
     const [title, setTitle] = useState('')
@@ -26,7 +26,7 @@ const AddArticle = () => {
     },[]);
 
     const getUserOptions = async () => {
-        const res = await axios.get('http://127.0.0.1:8000/api/users')
+        const res = await axios.get(API_HOST + 'users')
         const data = res.data.data
         return data.map(u => ({
             "id": u.id,
@@ -35,7 +35,7 @@ const AddArticle = () => {
     }
 
     const getCategoryOptions = async () => {
-        const res = await axios.get('http://127.0.0.1:8000/api/categories')
+        const res = await axios.get(API_HOST + 'categories')
         const data = res.data.data
         return data.map(u => ({
             "id": u.id,
@@ -72,7 +72,7 @@ const AddArticle = () => {
             formData.append("userId", userId);
             formData.append("categoryId", JSON.stringify(categoryId));
 
-            axios.post('http://127.0.0.1:8000/api/articles',formData)
+            axios.post(API_HOST + 'articles', formData)
                 .then((res) => {
                     if (res.data.error) {
                         alert(res.data.message)

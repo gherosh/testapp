@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\UserResource;
-use App\Models\Article;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -20,7 +21,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::orderBy('id', 'desc')->get());
+        $items = Cache::remember('users', 86400, function() {
+            return User::orderBy('id', 'desc')->get();
+        });
+        return UserResource::collection($items);
     }
 
     /**
@@ -69,6 +73,7 @@ class UserController extends Controller
                 $user->image = $relative_dir . '/' . $filename;
                 $user->save();
             }
+            Cache::forget('users');
         } catch (\Exception $e) {
             return response()->json([
                 'error' => true,
@@ -90,7 +95,10 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return new UserResource(User::whereId($id)->firstOrFail());
+        $item = Cache::remember('user'.$id, 86400, function() use ($id) {
+            return User::with('articles')->whereId($id)->firstOrFail();
+        });
+        return new UserResource($item);
     }
 
     /**
